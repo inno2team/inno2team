@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 from pymongo import MongoClient
-import certifi
+import certifi, bcrypt
 from bson import ObjectId
 from bson.json_util import dumps
 
@@ -17,14 +17,28 @@ app = Flask(__name__)
 def home():
     return render_template('index.html')
 
+@app.route('/regist')
+def signUp():
+   return render_template('./auth/signup.html')
+
+# 회원가입
+@app.route('/register', methods = ["POST"])
+
+def regist():
+    user_id = request.form['user_id']
+    password = bcrypt.hashpw(request.form['password'].encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+    nickname = request.form['nickname']
+    phone = request.form['phone']
+    return jsonify({'result': 'good'})
+
 
 @app.route("/room/list", methods=["GET"])
 def room_list_get():
     all_board = list(db.room.find(
         {}, {"user_id": False, "location": False}))
+    
 # 결과적으로 room_name, room_info, max_people, prt, _id만 나오게 된다.
     return jsonify({'result': dumps(all_board)})
-
 @app.route("/room/join", methods=["UPDATE"])
 def room_join():
     user_id = request.form['user_id']
