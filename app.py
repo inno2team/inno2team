@@ -17,6 +17,10 @@ app = Flask(__name__)
 def home():
     return render_template('index.html')
 
+@app.route('/create_room')
+def create_room():
+    return render_template('create_room.html')
+
 
 @app.route("/room/list", methods=["GET"])
 def room_list_get():
@@ -30,9 +34,18 @@ def room_join():
     user_id = request.form['user_id']
     room_id = ObjectId(request.form['room_id'])
     prt_users = db.room.find_one({"_id": room_id})["prt_users"]
-    if (user_id in prt_users):
+    # user_room_id = db.user.find_one({"user_id": user_id})["room_id"]
+    # if (room_id == user_room_id):
+    #     return jsonify({'msg':'이미 참가한 방입니다!'})
+    # else :
+    #     if (user_room_id is None) :
+    #         db.room.update_one({"_id" : room_id}, {"$inc" : {"prt" : 1}, "$push" :{"prt_users" : user_id}})
+    #         return jsonify({'msg':'참가 완료!!'})
+    #     else :
+    #         return jsonify({'msg':'이미 참가중인 방이 있습니다!'})
+    if (user_id in prt_users) :
         return jsonify({'msg':'이미 참가한 방입니다!'})
-    else:
+    else :
         db.room.update_one({"_id" : room_id}, {"$inc" : {"prt" : 1}, "$push" :{"prt_users" : user_id}})
         return jsonify({'msg':'참가 완료!!'})
 

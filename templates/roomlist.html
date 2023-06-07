@@ -22,13 +22,27 @@
             justify-content: center;
         }
 
-        .searching {
+        .login_box {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: left;
+        }
+
+        .input_box {
+            display: flex;
+            flex-direction: column;
+            align-items: start;
+            justify-content: center;
+        }
+
+        /* .searching {
             display: flex;
             flex-direction: row;
             align-items: stretch;
             justify-content: center;
             margin: 20px 20px 20px 20px;
-        }
+        } */
 
         .searching>.form-floating {
             width: 100%;
@@ -120,6 +134,11 @@
         }
         function join(room_id) {
             let user_id = "nobi1" //본 id는 임시로 넣어둔 것이며 로그인한 사용자에게 값을 받아서 저장한다.
+            //문제점 : 이미 다른 방에 참가중인 사람이 다른 방에 참가하려고 할때 어떻게 막을것인가?
+            //1. user db에 현재 참가중인지 아닌지의 상태를 표시한다.
+            //1_1. user가 값을 가지고 있을 필요가 없네... 매번 백엔드가 확인해 주면 그만아닌가?
+            //2. 모든 방의 참가자를 확인해서 user가 참가한 방이 있는지 확인한다.
+            //2_1. 확실히 1번의 방법이 빠를것 같긴 한데...
             let formData = new FormData();
             formData.append("user_id", user_id);
             formData.append("room_id", room_id);
@@ -137,17 +156,22 @@
 </head>
 
 <body>
-    <div class="roomlist">
-        <h2 style="text-align: center;">방명록</h2>
-        <div class="searching">
-            <div class="form-floating">
-                <textarea class="form-control" placeholder="Leave a comment here" id="comment"></textarea>
-                <label for="floatingTextarea2">찾으시는 방의 이름 또는 키워드를 입력해주세요.</label>
-            </div>
-            <button onclick="search()" type="button" class="btn btn-dark">
-                검색
-            </button>
+
+    <h2 style="text-align: center;"></h2>
+    <div class="login_box">
+        <div class="input_box">
+            <input type="text" class="id" placeholder="아이디">
+            <input type="text" class="pw" placeholder="비밀번호">
         </div>
+        <button onclick="search()" type="button" class="btn btn-dark">
+            로그인하기
+        </button>
+    </div>
+    <button onclick="location.href='/create_room'" type="button" class="btn btn-dark" style="float : right">
+        방 생성
+    </button>
+    <h2 style="text-align: center;">방 목록</h2>
+    <div class="roomlist">
         <div class="room_list">
             <table class="table">
                 <thead>
