@@ -4,6 +4,7 @@ import certifi
 from bson import ObjectId
 from bson.json_util import dumps
 
+
 ca = certifi.where()
 
 client = MongoClient(
@@ -12,11 +13,18 @@ db = client.dbsparta
 
 app = Flask(__name__)
 
+@app.route('/board/<board_id>')
+def room(board_id):
+   return render_template('board.html', id = board_id)
 
 @app.route('/')
 def home():
     return render_template('index.html')
 
+@app.route("/board/get/<room_id>", methods=["GET"])
+def board_get(room_id):
+    board_get = db.board.find_one({'room_id':room_id},{'_id':False})
+    return jsonify({'result':board_get})
 
 @app.route("/room/list", methods=["GET"])
 def room_list_get():
