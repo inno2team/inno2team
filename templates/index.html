@@ -16,6 +16,12 @@
       integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
       crossorigin="anonymous"
     />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"
+      integrity="sha512-3j3VU6WC5rPQB4Ld1jnLV7Kd5xr+cq9avvhwqzbH/taCRNURoeEpoPBK9pDyeukwSxwRPJ8fDgvYXd6SkaZ2TA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
 
     <title>모여보드자</title>
     <style>
@@ -24,6 +30,21 @@
         margin: 100px auto 0px auto;
       }
     </style>
+    <script type="module">
+      import jwtDecode from "https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/+esm";
+
+      setInterval(() => {
+        let cookie = $.cookie("mytoken");
+        if (cookie != undefined) {
+          let exp = jwtDecode(cookie).exp;
+          if (exp < Date.now() / 1000) {
+            $.removeCookie("mytoken");
+            alert("로그인이 만료 되었습니다.");
+            window.location.href = "/";
+          }
+        }
+      }, 1000 * 60);
+    </script>
   </head>
 
   <body>

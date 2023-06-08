@@ -8,7 +8,7 @@ from bson.json_util import dumps
 ca = certifi.where()
 
 client = MongoClient(
-    'mongodb+srv://loki:0000@cluster0.wcufqip.mongodb.net/?retryWrites=true&w=majority', tlsCAFile=ca)
+    'mongodb+srv://sparta:test@cluster0.vouw82r.mongodb.net/?retryWrites=true&w=majority', tlsCAFile=ca)
 db = client.dbsparta
 
 app = Flask(__name__)
@@ -25,6 +25,17 @@ def home():
         user_info = db.users.find_one({'user_id': current_user_id})
         return render_template('index.html', user_info = user_info)
     return render_template('index.html')
+
+# @app.route('/token')
+# def intervalToken():
+#     try:
+#         jwt.decode(request.cookies.get('mytoken')  , "moyoboardza", algorithms=['HS256'])
+#     except jwt.ExpiredSignatureError:
+#         return redirect(url_for('home', msg="로그인 시간이 만료되었습니다."))
+#     except jwt.exceptions.DecodeError:
+#         return redirect(url_for("home", msg="로그인 정보가 존재하지 않습니다."))
+#     return jsonify({'result' : 'success', 'msg' : '토큰 있음'})
+        
 
 @app.route('/regist')
 def signUp():
@@ -59,7 +70,7 @@ def login():
             # 시크릿 키가 있어야 토큰을 디코딩 해서 payload 값을 볼 수 있음.
             payload = {
                 'user_id' : user_id,
-                'exp' : datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+                'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=3)
             }
             # jwt 암호화
             # token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
@@ -125,7 +136,7 @@ def delete_room():
             payload = jwt.decode(token_receive, "moyoboardza", algorithms=['HS256'])
             user_info = db.users.find_one({'user_id': payload['user_id']})
         except jwt.ExpiredSignatureError:
-            return redirect(url_for('/', msg="로그인 시간이 만료되었습니다."))
+            return None
         reader_recieve = db.rooms.find_one({'_id':room_id_recieve})
         if reader_recieve['user_id'] == user_info['user_id']:
             db.rooms.delete_one({'_id': reader_recieve['_id']})
@@ -172,7 +183,7 @@ def get_current_user_id(token_receive):
             payload = jwt.decode(token_receive, "moyoboardza", algorithms=['HS256'])
             return payload['user_id']
         except jwt.ExpiredSignatureError:
-            return redirect(url_for('/', msg="로그인 시간이 만료되었습니다."))
+            return None
     return None
 
 if __name__ == '__main__':
