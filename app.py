@@ -21,15 +21,9 @@ def room(board_id):
 
 @app.route('/')
 def home():
-    token_receive = request.cookies.get('mytoken')
-    if token_receive is not None:
-        try:
-            payload = jwt.decode(token_receive, "moyoboardza", algorithms=['HS256'])
-            user_info = db.users.find_one({'user_id' : payload['user_id']})
-            return render_template('index.html', user_info = user_info)
-        except jwt.ExpiredSignatureError:
-            return redirect(url_for('/', msg="로그인 시간이 만료되었습니다."))
-        
+    user_info = token_decode()
+    if user_info is not None:
+        return render_template('index.html', user_info = user_info)
     return render_template('index.html')
 
 @app.route('/regist')
@@ -146,6 +140,15 @@ def create_room_post():
     db.room.insert_one(doc)
     return jsonify({'msg': '생성 완료!!'})
 
+def token_decode():
+    token_receive = request.cookies.get('mytoken')
+    if token_receive is not None:
+        try:
+            payload = jwt.decode(token_receive, "moyoboardza", algorithms=['HS256'])
+            user_info = db.users.find_one({'user_id' : payload['user_id']})
+            return user_info
+        except jwt.ExpiredSignatureError:
+            return redirect(url_for('/', msg="로그인 시간이 만료되었습니다."))
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
