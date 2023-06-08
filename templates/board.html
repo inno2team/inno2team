@@ -26,12 +26,20 @@
             margin-top: 100px;
             margin-bottom: 100px;
         }
+
+        .card-body {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+        }
     </style>
 
 
     <script>
         $(document).ready(function () {
             listing();
+            show_comment()
         });
 
 
@@ -40,12 +48,13 @@
         function listing() {
             fetch('/board/get/{{id}}').then((res) => res.json()).then((data) => {
                 if (data["msg"] === undefined) {
-                    let room = JSON.parse(data['result'])
+                    let room = data['result']
 
                     let name = room['room_name']
                     let info = room['room_info']
                     let location = room['location']
                     let owner = room['user_id']
+                    let owner_nickname = data['nickname']
                     let prt_users = room['prt_users']
 
                     let temp_html = `<div class="fs-1 text-center room-top">
@@ -55,7 +64,7 @@
                                 </div>
                                     
                                 <div class="fs-2 text-center room-bottom" id="phone_numbers">
-                                    <p> 방장 : ${owner} </p>
+                                    <p> 방장 : ${owner_nickname} </p>
                                 </div>`
 
                     $('#room').append(temp_html)
@@ -75,11 +84,75 @@
 
         function phone_search(user_id) {
             fetch(`/user/get/${user_id}`).then((res) => res.json()).then((data) => {
-                let temp_html = `<p> ${user_id} : ${data['result']['phone']} </p>`
+                let temp_html = `<p> ${data['result']['nickname']} : ${data['result']['phone']} </p>`
                 $('#phone_numbers').append(temp_html)
             })
         }
 
+
+
+
+
+        function show_comment() {
+            fetch('/comment/get/{{id}}').then((res) => res.json()).then((data) => {
+                let rows = JSON.parse(data['result'])
+
+
+
+                $('#comment-list').empty()
+                rows.forEach((a) => {
+                    let comment = a['comment']
+                    let nickname = a['nickname']
+                    let comment_id = a['_id']['$oid']
+                    
+
+
+                    let temp_html = `<div class="card">
+                                    <div class="card-body">
+                                        <blockquote class="blockquote mb-0 d-flex">
+                                            <p>${comment}</p>
+                                            <p>&nbsp-&nbsp ${nickname}</p>
+                                        </blockquote>
+                                        <div> 
+                                            <button type="button" onclick="delete_comment('${comment_id}')" class="btn btn-dark">삭제</button>
+                                        </div>
+
+                                    
+                                    </div>
+                                </div>`
+
+                    $('#comment-list').append(temp_html)
+                })
+
+            })
+        }
+
+        function save_comment() {
+
+            let comment = $('#comment').val()
+            let formData = new FormData();
+            formData.append("comment_give", comment);
+
+            fetch('/comment/save/{{id}}', { method: "POST", body: formData, }).then((res) => res.json()).then((data) => {
+                alert(data["msg"]);
+                window.location.reload()
+            });
+
+        }
+
+
+
+        function delete_comment(comment_id) {
+            let c_id = comment_id
+
+            let formData = new FormData();
+            formData.append("comment_id_give", c_id);
+
+            fetch('/comment/delete', { method: "POST", body: formData, }).then((res) => res.json()).then((data) => {
+                alert(data["msg"]);
+                window.location.reload()
+            });
+        }
 
     </script>
 
@@ -88,5 +161,28 @@
 <body>
     <div id="room">
     </div>
+
+    <div class="mycards" id="comment-list">
+
+
+    </div>
+
+    <div class="mypost">
+        <div class="d-flex">
+            <div class="form-floating w-100">
+                <textarea class="form-control" placeholder="Leave a comment here" id="comment"
+                    style="height: 135px"></textarea>
+                <label for="floatingTextarea2">댓글</label>
+            </div>
+            <button onclick="save_comment()" type="button" class="btn btn-dark">
+                댓글 남기기
+            </button>
+        </div>
+        
+    </div>
+
+
+
+
 </body>
 </html>

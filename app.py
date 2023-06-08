@@ -9,6 +9,7 @@ ca = certifi.where()
 
 client = MongoClient(
     'mongodb+srv://sparta:test@cluster0.vouw82r.mongodb.net/?retryWrites=true&w=majority', tlsCAFile=ca)
+
 db = client.dbsparta
 
 app = Flask(__name__)
@@ -25,18 +26,7 @@ def home():
         user_info = db.users.find_one({'user_id': current_user_id})
         return render_template('index.html', user_info = user_info)
     return render_template('index.html')
-
-# @app.route('/token')
-# def intervalToken():
-#     try:
-#         jwt.decode(request.cookies.get('mytoken')  , "moyoboardza", algorithms=['HS256'])
-#     except jwt.ExpiredSignatureError:
-#         return redirect(url_for('home', msg="로그인 시간이 만료되었습니다."))
-#     except jwt.exceptions.DecodeError:
-#         return redirect(url_for("home", msg="로그인 정보가 존재하지 않습니다."))
-#     return jsonify({'result' : 'success', 'msg' : '토큰 있음'})
-        
-
+  
 @app.route('/regist')
 def signUp():
    return render_template('./auth/signup.html')
@@ -84,13 +74,15 @@ def login():
 @app.route("/board/get/<room_id>", methods=["GET"])
 def board_get(room_id):
     current_user_id = get_current_user_id(request.cookies.get('mytoken'))
-    board_get = db.rooms.find_one({"_id": ObjectId(room_id)}, {"max_people": False, "prt": False, "_id": False})
+    board_get = db.rooms.find_one({"_id": ObjectId(room_id)}, {"_id": False})
+    owner = board_get['user_id']
+    owner_nickname = db.users.find_one({"user_id": owner})['nickname']
     if (current_user_id in board_get['prt_users']) :
-        return jsonify({'result': dumps(board_get)})
+        return jsonify({'result': board_get, 'nickname': owner_nickname})
     elif (current_user_id == None):
         return jsonify({'msg': '로그인이 필요합니다!'})
     else :
-        return jsonify({'msg': '참가한 적이 없는 방입니다!'})
+        return jsonify({'msg': '이미 마감된 방입니다!'})
 
 @app.route("/room/list", methods=["GET"])
 def room_list_get():
@@ -117,7 +109,7 @@ def room_join():
 
 @app.route("/user/get/<user_id>", methods=["GET"])
 def user_get(user_id):
-    user_get = db.users.find_one({"user_id": user_id}, {"_id": False, "phone": True})
+    user_get = db.users.find_one({"user_id": user_id}, {"_id": False})
     return jsonify({'result': user_get})
 
 
@@ -184,7 +176,46 @@ def get_current_user_id(token_receive):
             return payload['user_id']
         except jwt.ExpiredSignatureError:
             return None
-    return None
+    return None       
+
+@app.route("/comment/get/<room_id>", methods=["GET"])
+def comment_get(room_id):
+    all_comment = list(db.comment.find({"room_id": room_id}))
+    return jsonify({'result': dumps(all_comment)})
+
+@app.route("/comment/save/<room_id>", methods=["POST"])
+def comment_save(room_id):
+    comment_receive = request.form['comment_give']
+    room_id_receive = room_id
+    current_user_id = get_current_user_id(request.cookies.get('mytoken'))
+    user_info = db.users.find_one({'user_id': current_user_id})
+
+    doc = {
+        'comment' : comment_receive,
+        'room_id': room_id_receive,
+        'nickname': user_info['nickname'],
+        'user_id' : user_info['user_id']
+    }
+    db.comment.insert_one(doc)
+
+    return jsonify({'msg': '저장완료'})
+
+@app.route("/comment/delete", methods=["POST"])
+def comment_delete():
+    comment_obj_id = ObjectId(request.form['comment_id_give'])
+    current_user_id = get_current_user_id(request.cookies.get('mytoken'))
+    user_info = db.users.find_one({'user_id': current_user_id})
+
+    comment_user_id = db.comment.find_one({'_id' : comment_obj_id})['user_id']
+
+    if user_info['user_id'] == comment_user_id:
+        doc = {
+            '_id' : comment_obj_id
+        }
+        db.comment.delete_one(doc)
+        return jsonify({'msg': '삭제완료'})
+    else:
+        return jsonify({'msg': '작성자가 아닙니다.'})
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
