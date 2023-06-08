@@ -23,7 +23,7 @@
 
 .room_list>.table>thead>tr>.th-3 {
     width: 10%;
-    min-width: 100px;
+    min-width: 150px;
     max-width: 500px;
 }
 
