@@ -17,6 +17,7 @@
         let room_info = $('#room_info').val();
         let max_people = $('#max_people').val();
         let location = $('#location').val();
+      
         // let user_id='사람' //임시
 
         let formData = new FormData();
@@ -26,12 +27,12 @@
         formData.append("location_give", location);
         // formData.append("user_id_give", user_id); //임시
 
-
         fetch('/create_room', { method: "POST", body: formData })
             .then((response) => response.json())
             .then((data) => {
                 alert(data["msg"])
                 window.location.href='/'
+
             });
     }
 
@@ -137,6 +138,7 @@
                 <span class="input-group-text" id="inputGroup-sizing-default">방 이름</span>
                 <input type="text" class="form-control" aria-label="Sizing example input"
                     aria-describedby="inputGroup-sizing-default" id="room_name" placeholder="한글자 이상의 값" required>
+
             </div>
         </div>
         <div class="room_info">
@@ -164,6 +166,7 @@
         <div class="btn_position">
             <button type="button" class="btn-primary" onclick="save_info()">생성</button>
             <button type="button" class="btn-secondary" onclick="location.href='/'">취소</button>
+
         </div>
     </div>
 </body>
