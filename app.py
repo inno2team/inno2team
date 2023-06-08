@@ -173,7 +173,52 @@ def get_current_user_id(token_receive):
             return payload['user_id']
         except jwt.ExpiredSignatureError:
             return redirect(url_for('/', msg="로그인 시간이 만료되었습니다."))
-    return None
+        
+
+@app.route("/comment/get/<room_id>", methods=["GET"])
+def comment_get(room_id):
+    all_comment = list(db.comment.find({"room_id": room_id}))
+    return jsonify({'result': dumps(all_comment)})
+
+
+@app.route("/comment/save/<room_id>", methods=["POST"])
+def comment_save(room_id):
+    comment_receive = request.form['comment_give']
+    room_id_receive = room_id
+    user_info = token_decode()
+    # json
+    # params = request.get_json()
+    # print(params['user_id'])
+
+
+    doc = {
+        'comment' : comment_receive,
+        'room_id': room_id_receive,
+        'nickname': user_info['nickname']
+    }
+    db.comment.insert_one(doc)
+
+    return jsonify({'msg': '저장완료'})
+
+
+@app.route("/comment/delete", methods=["POST"])
+def comment_delete():
+    comment_obj_id = ObjectId(request.form['comment_id_give'])
+
+    user_info = token_decode()
+
+    # comment_nickname = list(db.comment.find({'_id' : comment_obj_id}))[0]['nickname']
+    comment_nickname = db.comment.find_one({'_id' : comment_obj_id})['nickname']
+
+    if user_info['nickname'] == comment_nickname:
+        doc = {
+            '_id' : comment_obj_id
+        }
+        db.comment.delete_one(doc)
+        return jsonify({'msg': '삭제완료'})
+    else:
+        return jsonify({'msg': '작성자가 아닙니다.'})
+
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
