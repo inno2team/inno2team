@@ -38,7 +38,6 @@ def regist():
     nickname = request.form['nickname']
     phone = request.form['phone']
     doc = {
-        'room_id'   : None,
         'user_id'   : user_id,
         'password'  : password,
         'nickname'  : nickname,
@@ -75,15 +74,17 @@ def login():
 
 @app.route("/board/get/<room_id>", methods=["GET"])
 def board_get(room_id):
-    board_get = db.room.find_one({"_id": ObjectId(room_id)}, {"max_people": False, "prt": False, "_id": False})
-    if (current_user_id in board_get['prt_users']) :
+    board_get = db.rooms.find_one({"_id": ObjectId(room_id)}, {"max_people": False, "prt": False, "_id": False})
+    if (token_decode().user_id in board_get['prt_users']) :
         return jsonify({'result': dumps(board_get)})
+    elif (token_decode().user_id == None):
+        return jsonify({'msg': '로그인이 필요합니다!'})
     else :
         return jsonify({'msg': '참가한 적이 없는 방입니다!'})
 
 @app.route("/room/list", methods=["GET"])
 def room_list_get():
-    all_board = list(db.room.find(
+    all_board = list(db.rooms.find(
         {}, {"user_id": False, "location": False}))
     
 # 결과적으로 room_name, room_info, max_people, prt, _id만 나오게 된다.
@@ -92,18 +93,20 @@ def room_list_get():
 @app.route("/room/join", methods=["UPDATE"])
 def room_join():
     room_id = ObjectId(request.form['room_id'])
-    prt_users = db.room.find_one({"_id": room_id}, {"prt_users": True, "_id": False})["prt_users"]
-    if (current_user_id in prt_users):
+    prt_users = db.rooms.find_one({"_id": room_id}, {"prt_users": True, "_id": False})["prt_users"]
+    if (token_decode().user_id in prt_users):
         return jsonify({'msg': '이미 참가한 방입니다!'})
+    elif (token_decode().user_id == None):
+        return jsonify({'msg': '로그인이 필요합니다!'})
     else:
-        db.room.update_one({"_id": room_id}, {
-                           "$inc": {"prt": 1}, "$push": {"prt_users": current_user_id}})
+        db.rooms.update_one({"_id": room_id}, {
+                           "$inc": {"prt": 1}, "$push": {"prt_users": token_decode().user_id}})
         return jsonify({'msg': '참가 완료!!'})
 
 
 @app.route("/user/get/<user_id>", methods=["GET"])
 def user_get(user_id):
-    user_get = db.user.find_one({"user_id": user_id}, {"_id": False, "phone": True})
+    user_get = db.users.find_one({"user_id": user_id}, {"_id": False, "phone": True})
     return jsonify({'result': user_get})
 
 
@@ -118,27 +121,29 @@ def create_room_post():
     room_info_receive = request.form['room_info_give']
     max_people_receive = request.form['max_people_give']
     location_receive = request.form['location_give']
-    prt_users = [current_user_id]
+    prt_users = [token_decode().user_id]
 
-    if (len(room_name_receive) < 1 or
+    if (token_decode().user_id == None):
+        return jsonify({'msg': '로그인이 필요합니다!'})
+    elif (len(room_name_receive) < 1 or
         len(room_info_receive) < 1 or
         int(max_people_receive) < 2 or
         len(location_receive) < 1):
         return jsonify({'msg': '생성 실패!! 입력값을 확인해 주세요.'})
-
-    # room_num = list(db.room.find({}, {'_id': False}))
-    # room_reader_id=db.room.find({'user_id':''})
-    doc = {
-        'room_name': room_name_receive,
-        'room_info': room_info_receive,
-        'max_people': max_people_receive,
-        'location': location_receive,
-        'prt': 1,
-        'user_id': current_user_id,
-        'prt_users': prt_users
-    }
-    db.room.insert_one(doc)
-    return jsonify({'msg': '생성 완료!!'})
+    else:
+        # room_num = list(db.rooms.find({}, {'_id': False}))
+        # room_reader_id=db.rooms.find({'user_id':''})
+        doc = {
+            'room_name': room_name_receive,
+            'room_info': room_info_receive,
+            'max_people': max_people_receive,
+            'location': location_receive,
+            'prt': 1,
+            'user_id': token_decode().user_id,
+            'prt_users': prt_users
+        }
+        db.rooms.insert_one(doc)
+        return jsonify({'msg': '생성 완료!!'})
 
 def token_decode():
     token_receive = request.cookies.get('mytoken')
@@ -149,6 +154,7 @@ def token_decode():
             return user_info
         except jwt.ExpiredSignatureError:
             return redirect(url_for('/', msg="로그인 시간이 만료되었습니다."))
+    return None
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
