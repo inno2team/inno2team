@@ -17,21 +17,22 @@
         let room_info = $('#room_info').val();
         let max_people = $('#max_people').val();
         let location = $('#location').val();
-        let user_id='사람'
+      
+        // let user_id='사람' //임시
 
         let formData = new FormData();
         formData.append("room_name_give", room_name);
         formData.append("room_info_give", room_info);
         formData.append("max_people_give", max_people);
         formData.append("location_give", location);
-        formData.append("user_id_give", user_id);
-
+        // formData.append("user_id_give", user_id); //임시
 
         fetch('/create_room', { method: "POST", body: formData })
             .then((response) => response.json())
             .then((data) => {
-                alert(data["msg"]);
-                window.location.reload();
+                alert(data["msg"])
+                window.location.href='/'
+
             });
     }
 
@@ -136,33 +137,36 @@
             <div class="input-group mb-3">
                 <span class="input-group-text" id="inputGroup-sizing-default">방 이름</span>
                 <input type="text" class="form-control" aria-label="Sizing example input"
-                    aria-describedby="inputGroup-sizing-default" id="room_name">
+                    aria-describedby="inputGroup-sizing-default" id="room_name" placeholder="한글자 이상의 값" required>
+
             </div>
         </div>
         <div class="room_info">
             <div class="input-group mb-3">
                 <span class="input-group-text" id="inputGroup-sizing-default">방 소개 </span>
                 <input type="text" class="form-control" aria-label="Sizing example input"
-                    aria-describedby="inputGroup-sizing-default" id="room_info">
+                    aria-describedby="inputGroup-sizing-default" id="room_info"
+                    placeholder="한글자 이상의 값" required>
             </div>
         </div>
         <div class="max_people">
             <div class="input-group mb-3">
                 <span class="input-group-text" id="inputGroup-sizing-default">인원 수 </span>
                 <input type="text" class="form-control" aria-label="Sizing example input"
-                    aria-describedby="inputGroup-sizing-default" id="max_people">
+                    aria-describedby="inputGroup-sizing-default" id="max_people" placeholder="2 이상의 값" required>
             </div>
         </div>
         <div class="location">
             <div class="input-group mb-3">
                 <span class="input-group-text_2" id="inputGroup-sizing-default"><p class="move_word">모일장소</p></span>
                 <input type="text" class="form-control" aria-label="Sizing example input"
-                    aria-describedby="inputGroup-sizing-default" id="location">
+                    aria-describedby="inputGroup-sizing-default" id="location" placeholder="한글자 이상의 값" required>
             </div>
         </div>
         <div class="btn_position">
-            <button type="button" class="btn-primary" onclick="save_info(); location.href='roomlist'">생성</button>
-            <button type="button" class="btn-secondary" onclick="location.href='room_ist'">취소</button>
+            <button type="button" class="btn-primary" onclick="save_info()">생성</button>
+            <button type="button" class="btn-secondary" onclick="location.href='/'">취소</button>
+
         </div>
     </div>
 </body>

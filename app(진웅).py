@@ -1,10 +1,16 @@
 from flask import Flask, render_template, request, jsonify
 from pymongo import MongoClient
 from bson import json_util
+import certifi
+
 app = Flask(__name__)
 
-client = MongoClient('mongodb+srv://loki:0000@cluster0.wcufqip.mongodb.net/?retryWrites=true&w=majority')
+ca = certifi.where()
+
+client = MongoClient(
+    'mongodb+srv://loki:0000@cluster0.wcufqip.mongodb.net/?retryWrites=true&w=majority', tlsCAFile=ca)
 db = client.dbsparta
+
 @app.route('/')
 def home():
     return render_template('create_room.html')
