@@ -20,3 +20,7 @@
 | 로그아웃  |             |     |         | 200 OK   |
 | 방 참여   | POST/update |     | room_id | 200 OK   |
 | 방 나가기 | POST/update |     | room_id | 200 OK   |
+
+
+#### Thumbnail
+![image](https://github.com/inno2team/inno2team/assets/57711744/c4da4184-dce2-47db-80d7-aa4678c6b101)
