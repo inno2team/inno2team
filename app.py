@@ -7,7 +7,8 @@ from bson.json_util import dumps
 
 ca = certifi.where()
 
-client = MongoClient('mongodb+srv://sparta:test@cluster0.vouw82r.mongodb.net/?retryWrites=true&w=majority', tlsCAFile=ca)
+client = MongoClient(
+    'mongodb+srv://loki:0000@cluster0.wcufqip.mongodb.net/?retryWrites=true&w=majority', tlsCAFile=ca)
 db = client.dbsparta
 
 app = Flask(__name__)
@@ -112,6 +113,27 @@ def user_get(user_id):
 @app.route('/create_room')
 def create_room():
     return render_template('create_room.html')
+
+
+
+@app.route("/delete", methods=["POST"])
+def delete_room():
+    room_id_recieve = ObjectId(request.form['room_id'])
+    token_receive = request.cookies.get('mytoken')
+    if token_receive is not None:
+        try:
+            payload = jwt.decode(token_receive, "moyoboardza", algorithms=['HS256'])
+            user_info = db.users.find_one({'user_id': payload['user_id']})
+        except jwt.ExpiredSignatureError:
+            return redirect(url_for('/', msg="로그인 시간이 만료되었습니다."))
+        reader_recieve = db.rooms.find_one({'_id':room_id_recieve})
+        if reader_recieve['user_id'] == user_info['user_id']:
+            db.rooms.delete_one({'_id': reader_recieve['_id']})
+            return jsonify({'msg': '삭제 완료'})
+        else:
+            return jsonify({'msg': "삭제 불가"})
+
+
 
 
 @app.route("/create_room", methods=["POST"])

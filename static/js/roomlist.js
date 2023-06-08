@@ -42,6 +42,8 @@ function listing() {
                                     <button onclick="join('${room_id}')" class="btn btn-outline-dark" type="button" style="float : right">
                                         참가
                                     </button>
+                                    <button type="button" class="btn-secondary" onclick="delete_room('${room_id}')">삭제</button>
+
                                 </td>
                             </tr>`
             }
@@ -59,3 +61,16 @@ function join(room_id) {
         window.location.reload()
     })
 }
+  
+  function delete_room(room_id) {
+      let formData = new FormData();
+      formData.append('room_id',room_id)  
+      console.log(room_id)
+      fetch('/delete', { method: "POST", body: formData})
+        .then(response => response.json())
+        .then(data => {
+          alert(data["msg"]);
+          window.location.reload();
+        })
+  }
+
