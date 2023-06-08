@@ -61,13 +61,18 @@
 
 <body>
   <div class="d-flex">
-    <div class="main">
-      {% include "./auth/signin.html" %}
-    </div>
     <div class="title">
     </div>
   </div>
+  <div class="main">
+    <p>하고는 싶지만 같이 할 사람이 없는 보드게임, 모임, 게임<br>
+      그렇다고 사람들을 모으기 위해 내 개인정보를 알려주는 것도...<br>
+      목표 인원이 달성 되기전까지는 서로의 정보를 알 수 없음<br>
+      본인이 참가한 방이 아니면 입장 불가<br>
+      오직 같이 만날 사람들끼리 의견 조율을 위한 댓글창<br>
+  </div>
   <div class="main2">
+    {% include "./auth/signin.html" %}
     {% include "./roomlist.html" %}
   </div>
 </body>
