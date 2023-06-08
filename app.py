@@ -78,7 +78,7 @@ def board_get(room_id):
     elif (current_user_id == None):
         return jsonify({'msg': '로그인이 필요합니다!'})
     else :
-        return jsonify({'msg': '참가한 적이 없는 방입니다!'})
+        return jsonify({'msg': '이미 마감된 방입니다!'})
 
 @app.route("/room/list", methods=["GET"])
 def room_list_get():
@@ -184,7 +184,8 @@ def comment_get(room_id):
 def comment_save(room_id):
     comment_receive = request.form['comment_give']
     room_id_receive = room_id
-    user_info = token_decode()
+    current_user_id = get_current_user_id(request.cookies.get('mytoken'))
+    user_info = db.users.find_one({'user_id': current_user_id})
     # json
     # params = request.get_json()
     # print(params['user_id'])
@@ -203,10 +204,9 @@ def comment_save(room_id):
 @app.route("/comment/delete", methods=["POST"])
 def comment_delete():
     comment_obj_id = ObjectId(request.form['comment_id_give'])
+    current_user_id = get_current_user_id(request.cookies.get('mytoken'))
+    user_info = db.users.find_one({'user_id': current_user_id})
 
-    user_info = token_decode()
-
-    # comment_nickname = list(db.comment.find({'_id' : comment_obj_id}))[0]['nickname']
     comment_nickname = db.comment.find_one({'_id' : comment_obj_id})['nickname']
 
     if user_info['nickname'] == comment_nickname:
