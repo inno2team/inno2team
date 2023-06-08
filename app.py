@@ -21,7 +21,7 @@ def room(board_id):
 
 @app.route('/')
 def home():
-    user_info = token_decode()
+    user_info = token_decode(request.cookies.get('mytoken'))
     if user_info is not None:
         return render_template('index.html', user_info = user_info)
     return render_template('index.html')
@@ -50,7 +50,6 @@ def regist():
 def login():
     user_id = request.form['user_id']
     password = request.form['password']
-    print(user_id, password)
     user_info = db.users.find_one({'user_id':user_id}, {'_id':False})
 
     # password check
@@ -65,8 +64,7 @@ def login():
             # jwt 암호화
             # token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
             token = jwt.encode(payload, "moyoboardza", algorithm="HS256")
-            print(token)
-            return jsonify({'result' : 'success', 'token' : token})
+            return jsonify({'result' : 'success', 'msg': '로그인 완료!', 'token' : token})
         else :
             return jsonify({'result': 'fail', 'msg': '비밀번호가 일치하지 않습니다.'})
     else : 
@@ -145,8 +143,7 @@ def create_room_post():
         db.rooms.insert_one(doc)
         return jsonify({'msg': '생성 완료!!'})
 
-def token_decode():
-    token_receive = request.cookies.get('mytoken')
+def token_decode(token_receive):
     if token_receive is not None:
         try:
             payload = jwt.decode(token_receive, "moyoboardza", algorithms=['HS256'])
@@ -155,6 +152,5 @@ def token_decode():
         except jwt.ExpiredSignatureError:
             return redirect(url_for('/', msg="로그인 시간이 만료되었습니다."))
     return None
-
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
