@@ -26,7 +26,6 @@
             margin-top: 100px;
             margin-bottom: 100px;
         }
-    
     </style>
 
 
@@ -40,33 +39,47 @@
 
         function listing() {
             fetch('/board/get/{{id}}').then((res) => res.json()).then((data) => {
+                if (data["msg"] === undefined) {
+                    let room = JSON.parse(data['result'])
 
-                // $('room').empty()
+                    console.log(room)
+                    // $('room').empty()
 
-                let name = data['result']['room_name']
-                let location = data['result']['location']
-                let user1 = data['result']['user1']
-                let user2 = data['result']['user2']
-                let user3 = data['result']['user3']
-                let user4 = data['result']['user4']
+                    let name = room['room_name']
+                    let info = room['room_info']
+                    let location = room['location']
+                    let owner = room['user_id']
+                    let prt_users = room['prt_users']
 
-
-                let temp_html = `<div class="fs-1 text-center room-top">
+                    let temp_html = `<div class="fs-1 text-center room-top">
                                     <p>방이름: ${name} </p>
+                                    <p>상세정보: ${info} </p>
                                     <p>모임 장소: ${location}</p>
                                 </div>
-
-                                <div class="fs-2 text-center room-bottom">
-                                    <p>방장 연락처: ${user1} </p>
-                                    <p>사람1 연락처:${user2} </p>
-                                    <p>사람2 연락처:${user3} </p>
-                                    <p>사람3 연락처:${user4} </p>
+                                    
+                                <div class="fs-2 text-center room-bottom" id="phone_numbers">
+                                    <p> 방장 : ${owner} </p>
                                 </div>`
 
-                $('#room').append(temp_html)
+                    $('#room').append(temp_html)
+                    phone_search(owner)
 
+                    prt_users.forEach((u) => {
+                        if (u != owner) {
+                            phone_search(u)
+                        }
+                    })
+                } else {
+                    alert(data["msg"]);
+                    location.href='/'
+                }
+            })
+        }
 
-
+        function phone_search(user_id) {
+            fetch(`/user/get/${user_id}`).then((res) => res.json()).then((data) => {
+                let temp_html = `<p> ${user_id} : ${data['result']['phone']} </p>`
+                $('#phone_numbers').append(temp_html)
             })
         }
 
