@@ -4,23 +4,6 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
-      crossorigin="anonymous"
-    />
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"
-      integrity="sha512-3j3VU6WC5rPQB4Ld1jnLV7Kd5xr+cq9avvhwqzbH/taCRNURoeEpoPBK9pDyeukwSxwRPJ8fDgvYXd6SkaZ2TA=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-      crossorigin="anonymous"
-    ></script>
     <style>
       .login_box {
         padding: 1rem;
@@ -56,6 +39,12 @@
             window.location.href = "/";
           });
       };
+      const onClickLogout = () => {
+        if (confirm("로그아웃 하시겠습니까??") === true) {
+          $.removeCookie("mytoken");
+          window.location.href = "/";
+        }
+      };
     </script>
   </head>
   <body>
@@ -63,6 +52,20 @@
     <div>
       <!-- login box -->
       <div class="login_box">
+        {% if user_info != null %}
+        <!-- id -->
+        <div><b>{{ user_info.nickname }}</b> 님 어서오세요.</div>
+        <!-- logout -->
+        <div class="buttons mt-5">
+          <button
+            type="button"
+            class="btn btn-outline-danger"
+            onclick="onClickLogout()"
+          >
+            로그아웃
+          </button>
+        </div>
+        {% else %}
         <!-- id -->
         <div class="form-floating mb-3">
           <input
@@ -86,7 +89,7 @@
           <label for="password">Password</label>
         </div>
         <!-- buttons -->
-        <div class="buttons">
+        <div class="button_box">
           <button
             type="button"
             class="btn btn-outline-danger"
@@ -102,6 +105,7 @@
             로그인
           </button>
         </div>
+        {% endif %}
       </div>
     </div>
   </body>

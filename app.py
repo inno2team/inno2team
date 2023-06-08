@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for
 from pymongo import MongoClient
 import certifi, bcrypt, jwt, datetime
 from bson import ObjectId
@@ -21,6 +21,15 @@ def room(board_id):
 
 @app.route('/')
 def home():
+    token_receive = request.cookies.get('mytoken')
+    if token_receive is not None:
+        try:
+            payload = jwt.decode(token_receive, "moyoboardza", algorithms=['HS256'])
+            user_info = db.users.find_one({'user_id' : payload['user_id']})
+            return render_template('index.html', user_info = user_info)
+        except jwt.ExpiredSignatureError:
+            return redirect(url_for('/', msg="로그인 시간이 만료되었습니다."))
+        
     return render_template('index.html')
 
 @app.route('/regist')
