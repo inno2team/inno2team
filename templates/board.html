@@ -48,12 +48,13 @@
         function listing() {
             fetch('/board/get/{{id}}').then((res) => res.json()).then((data) => {
                 if (data["msg"] === undefined) {
-                    let room = JSON.parse(data['result'])
+                    let room = data['result']
 
                     let name = room['room_name']
                     let info = room['room_info']
                     let location = room['location']
                     let owner = room['user_id']
+                    let owner_nickname = data['nickname']
                     let prt_users = room['prt_users']
 
                     let temp_html = `<div class="fs-1 text-center room-top">
@@ -63,7 +64,7 @@
                                 </div>
                                     
                                 <div class="fs-2 text-center room-bottom" id="phone_numbers">
-                                    <p> 방장 : ${owner} </p>
+                                    <p> 방장 : ${owner_nickname} </p>
                                 </div>`
 
                     $('#room').append(temp_html)
@@ -83,7 +84,7 @@
 
         function phone_search(user_id) {
             fetch(`/user/get/${user_id}`).then((res) => res.json()).then((data) => {
-                let temp_html = `<p> ${user_id} : ${data['result']['phone']} </p>`
+                let temp_html = `<p> ${data['result']['nickname']} : ${data['result']['phone']} </p>`
                 $('#phone_numbers').append(temp_html)
             })
         }

@@ -72,9 +72,11 @@ def login():
 @app.route("/board/get/<room_id>", methods=["GET"])
 def board_get(room_id):
     current_user_id = get_current_user_id(request.cookies.get('mytoken'))
-    board_get = db.rooms.find_one({"_id": ObjectId(room_id)}, {"max_people": False, "prt": False, "_id": False})
+    board_get = db.rooms.find_one({"_id": ObjectId(room_id)}, {"_id": False})
+    owner = board_get['user_id']
+    owner_nickname = db.users.find_one({"user_id": owner})['nickname']
     if (current_user_id in board_get['prt_users']) :
-        return jsonify({'result': dumps(board_get)})
+        return jsonify({'result': board_get, 'nickname': owner_nickname})
     elif (current_user_id == None):
         return jsonify({'msg': '로그인이 필요합니다!'})
     else :
@@ -105,7 +107,7 @@ def room_join():
 
 @app.route("/user/get/<user_id>", methods=["GET"])
 def user_get(user_id):
-    user_get = db.users.find_one({"user_id": user_id}, {"_id": False, "phone": True})
+    user_get = db.users.find_one({"user_id": user_id}, {"_id": False})
     return jsonify({'result': user_get})
 
 
@@ -186,15 +188,12 @@ def comment_save(room_id):
     room_id_receive = room_id
     current_user_id = get_current_user_id(request.cookies.get('mytoken'))
     user_info = db.users.find_one({'user_id': current_user_id})
-    # json
-    # params = request.get_json()
-    # print(params['user_id'])
-
 
     doc = {
         'comment' : comment_receive,
         'room_id': room_id_receive,
-        'nickname': user_info['nickname']
+        'nickname': user_info['nickname'],
+        'user_id' : user_info['user_id']
     }
     db.comment.insert_one(doc)
 
@@ -207,9 +206,9 @@ def comment_delete():
     current_user_id = get_current_user_id(request.cookies.get('mytoken'))
     user_info = db.users.find_one({'user_id': current_user_id})
 
-    comment_nickname = db.comment.find_one({'_id' : comment_obj_id})['nickname']
+    comment_user_id = db.comment.find_one({'_id' : comment_obj_id})['user_id']
 
-    if user_info['nickname'] == comment_nickname:
+    if user_info['user_id'] == comment_user_id:
         doc = {
             '_id' : comment_obj_id
         }
