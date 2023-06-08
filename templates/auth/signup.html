@@ -37,22 +37,39 @@
       }
     </style>
     <script>
+      let validate = false;
       const onClickRegist = () => {
-        let formData = new FormData();
-        formData.append("user_id", $("#user_id").val());
-        formData.append("password", $("#password").val());
-        formData.append("nickname", $("#nickname").val());
-        formData.append("phone", $("#phone").val());
-        fetch("/regist", { method: "POST", body: formData })
-          .then((res) => res.json())
-          .then((data) => {
-            alert(data.msg);
-            location.href = "/";
-          });
+        if (validate) {
+          let formData = new FormData();
+          formData.append("user_id", $("#user_id").val());
+          formData.append("password", $("#password").val());
+          formData.append("nickname", $("#nickname").val());
+          formData.append("phone", $("#phone").val());
+          fetch("/regist", { method: "POST", body: formData })
+            .then((res) => res.json())
+            .then((data) => {
+              alert(data.msg);
+              location.href = "/";
+            });
+        } else {
+          alert("ID중복확인을 하지 않았습니다.");
+        }
       };
 
       const onClickCancelBtn = () => {
         window.location.href = "/";
+      };
+
+      const onClickIdValidate = () => {
+        let formData = new FormData();
+        formData.append("user_id", $("#user_id").val());
+        fetch("/validate", { method: "POST", body: formData })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.result === "success") validate = true;
+
+            alert(data.msg);
+          });
       };
     </script>
   </head>
@@ -67,7 +84,7 @@
       <!-- 회원가입 form 박스 -->
       <div>
         <!-- 아이디 -->
-        <div class="form-floating mb-3">
+        <div class="form-floating mb-3 input-group">
           <input
             type="text"
             class="form-control"
@@ -77,6 +94,16 @@
             required
           />
           <label for="user_id">ID</label>
+          <div class="input-group-append h-2">
+            <button
+              class="btn btn-outline-primary"
+              type="button"
+              style="height: 100%"
+              onclick="onClickIdValidate()"
+            >
+              중복확인
+            </button>
+          </div>
         </div>
 
         <!-- 비밀번호 -->

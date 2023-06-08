@@ -7,7 +7,9 @@ from bson.json_util import dumps
 
 ca = certifi.where()
 
-client = MongoClient('mongodb+srv://sparta:test@cluster0.vouw82r.mongodb.net/?retryWrites=true&w=majority', tlsCAFile=ca)
+client = MongoClient(
+    'mongodb+srv://sparta:test@cluster0.vouw82r.mongodb.net/?retryWrites=true&w=majority', tlsCAFile=ca)
+
 db = client.dbsparta
 
 app = Flask(__name__)
@@ -24,7 +26,7 @@ def home():
         user_info = db.users.find_one({'user_id': current_user_id})
         return render_template('index.html', user_info = user_info)
     return render_template('index.html')
-
+  
 @app.route('/regist')
 def signUp():
    return render_template('./auth/signup.html')
@@ -44,6 +46,17 @@ def regist():
     }
     db.users.insert_one(doc)
     return jsonify({'result': 'success', 'msg': '회원가입 되었습니다.'})
+
+@app.route('/validate', methods = ["POST"])
+def validate():
+    user_id = request.form['user_id']
+    findUser = db.users.find_one({'user_id': user_id}, {'_id': False})
+    print(findUser)
+    if findUser is not None:
+        return jsonify({'result': 'fail', 'msg': '중복된 아이디 입니다. 다시 입력하세요.'})
+    else :
+        return jsonify({'result': 'success', 'msg': '사용 가능한 아이디 입니다.'})
+    
 # 로그인
 @app.route('/login', methods= ["POST"])
 def login():
@@ -58,7 +71,7 @@ def login():
             # 시크릿 키가 있어야 토큰을 디코딩 해서 payload 값을 볼 수 있음.
             payload = {
                 'user_id' : user_id,
-                'exp' : datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+                'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=3)
             }
             # jwt 암호화
             # token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
@@ -126,7 +139,7 @@ def delete_room():
             payload = jwt.decode(token_receive, "moyoboardza", algorithms=['HS256'])
             user_info = db.users.find_one({'user_id': payload['user_id']})
         except jwt.ExpiredSignatureError:
-            return redirect(url_for('/', msg="로그인 시간이 만료되었습니다."))
+            return None
         reader_recieve = db.rooms.find_one({'_id':room_id_recieve})
         if reader_recieve['user_id'] == user_info['user_id']:
             db.rooms.delete_one({'_id': reader_recieve['_id']})
@@ -172,15 +185,14 @@ def get_current_user_id(token_receive):
         try:
             payload = jwt.decode(token_receive, "moyoboardza", algorithms=['HS256'])
             return payload['user_id']
-        except jwt.ExpiredSignatureError:   
-            return redirect(url_for('/', msg="로그인 시간이 만료되었습니다."))
-        
+        except jwt.ExpiredSignatureError:
+            return None
+    return None       
 
 @app.route("/comment/get/<room_id>", methods=["GET"])
 def comment_get(room_id):
     all_comment = list(db.comment.find({"room_id": room_id}))
     return jsonify({'result': dumps(all_comment)})
-
 
 @app.route("/comment/save/<room_id>", methods=["POST"])
 def comment_save(room_id):
@@ -199,7 +211,6 @@ def comment_save(room_id):
 
     return jsonify({'msg': '저장완료'})
 
-
 @app.route("/comment/delete", methods=["POST"])
 def comment_delete():
     comment_obj_id = ObjectId(request.form['comment_id_give'])
@@ -216,7 +227,6 @@ def comment_delete():
         return jsonify({'msg': '삭제완료'})
     else:
         return jsonify({'msg': '작성자가 아닙니다.'})
-
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
