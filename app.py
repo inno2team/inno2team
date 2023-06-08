@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 from pymongo import MongoClient
-import certifi, bcrypt
+import certifi, bcrypt, jwt, datetime
 from bson import ObjectId
 from bson.json_util import dumps
 
@@ -23,9 +23,7 @@ def signUp():
 
 # 회원가입
 @app.route('/regist', methods = ["POST"])
-
 def regist():
-    print(request.form)
     user_id = request.form['user_id']
     password = bcrypt.hashpw(request.form['password'].encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
     nickname = request.form['nickname']
@@ -39,6 +37,33 @@ def regist():
     }
     db.users.insert_one(doc)
     return jsonify({'result': 'success', 'msg': '회원가입 되었습니다.'})
+# 로그인
+@app.route('/login', methods= ["POST"])
+def login():
+    user_id = request.form['user_id']
+    password = request.form['password']
+    print(user_id, password)
+    user_info = db.users.find_one({'user_id':user_id}, {'_id':False})
+
+    # password check
+    if user_info is not None:
+        if bcrypt.checkpw(password.encode("utf-8"), user_info['password'].encode("utf-8")) is True:
+            # payload와 시크릿 키가 필요
+            # 시크릿 키가 있어야 토큰을 디코딩 해서 payload 값을 볼 수 있음.
+            payload = {
+                'user_id' : user_id,
+                'exp' : datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+            }
+            # jwt 암호화
+            # token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
+            token = jwt.encode(payload, "moyoboardza", algorithm="HS256")
+            print(token)
+            return jsonify({'result' : 'success', 'token' : token})
+        else :
+            return jsonify({'result': 'fail', 'msg': '비밀번호가 일치하지 않습니다.'})
+    else : 
+        return jsonify({'result': 'fail', 'msg': '아이디가 일치하지 않습니다.'})
+
 
 
 @app.route("/room/list", methods=["GET"])
