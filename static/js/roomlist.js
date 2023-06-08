@@ -51,9 +51,7 @@ function listing() {
     });
 }
 function join(room_id) {
-    // let user_id = "nobi1" //임시
     let formData = new FormData();
-    // formData.append("user_id", user_id); //임시
     formData.append("room_id", room_id);
 
     fetch('/room/join', { method: "UPDATE", body: formData }).then((res) => res.json()).then((data) => {

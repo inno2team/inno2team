@@ -42,9 +42,6 @@
                 if (data["msg"] === undefined) {
                     let room = JSON.parse(data['result'])
 
-                    console.log(room)
-                    // $('room').empty()
-
                     let name = room['room_name']
                     let info = room['room_info']
                     let location = room['location']
@@ -90,23 +87,6 @@
 
 <body>
     <div id="room">
-        <!-- <div>
-            <p>방이름: </p>
-            <p>모임 장소: </p>
-        </div>
-
-        <div>
-            <p>방장 연락처: </p>
-            <p>사람1 연락처: </p>
-            <p>사람2 연락처: </p>
-            <p>사람3 연락처: </p>
-        </div> -->
     </div>
-
-
-
-
-
 </body>
-
 </html>

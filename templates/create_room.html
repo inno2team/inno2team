@@ -17,15 +17,12 @@
         let room_info = $('#room_info').val();
         let max_people = $('#max_people').val();
         let location = $('#location').val();
-      
-        // let user_id='사람' //임시
 
         let formData = new FormData();
         formData.append("room_name_give", room_name);
         formData.append("room_info_give", room_info);
         formData.append("max_people_give", max_people);
         formData.append("location_give", location);
-        // formData.append("user_id_give", user_id); //임시
 
         fetch('/create_room', { method: "POST", body: formData })
             .then((response) => response.json())
