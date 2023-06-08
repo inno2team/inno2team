@@ -7,8 +7,7 @@ from bson.json_util import dumps
 
 ca = certifi.where()
 
-client = MongoClient(
-    'mongodb+srv://loki:0000@cluster0.wcufqip.mongodb.net/?retryWrites=true&w=majority', tlsCAFile=ca)
+client = MongoClient('mongodb+srv://sparta:test@cluster0.vouw82r.mongodb.net/?retryWrites=true&w=majority', tlsCAFile=ca)
 db = client.dbsparta
 
 app = Flask(__name__)
@@ -171,7 +170,7 @@ def get_current_user_id(token_receive):
         try:
             payload = jwt.decode(token_receive, "moyoboardza", algorithms=['HS256'])
             return payload['user_id']
-        except jwt.ExpiredSignatureError:
+        except jwt.ExpiredSignatureError:   
             return redirect(url_for('/', msg="로그인 시간이 만료되었습니다."))
         
 
