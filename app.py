@@ -44,7 +44,7 @@ def regist():
     nickname = request.form['nickname']
     phone = request.form['phone']
     doc = {
-        'rood_id'   : None,
+        'room_id'   : None,
         'user_id'   : user_id,
         'password'  : password,
         'nickname'  : nickname,
