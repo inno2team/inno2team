@@ -7,8 +7,7 @@ from bson.json_util import dumps
 
 ca = certifi.where()
 
-client = MongoClient(
-    'mongodb+srv://loki:0000@cluster0.wcufqip.mongodb.net/?retryWrites=true&w=majority', tlsCAFile=ca)
+client = MongoClient('mongodb+srv://sparta:test@cluster0.vouw82r.mongodb.net/?retryWrites=true&w=majority', tlsCAFile=ca)
 db = client.dbsparta
 
 app = Flask(__name__)
