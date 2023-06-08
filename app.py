@@ -22,14 +22,23 @@ def signUp():
    return render_template('./auth/signup.html')
 
 # 회원가입
-@app.route('/register', methods = ["POST"])
+@app.route('/regist', methods = ["POST"])
 
 def regist():
+    print(request.form)
     user_id = request.form['user_id']
     password = bcrypt.hashpw(request.form['password'].encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
     nickname = request.form['nickname']
     phone = request.form['phone']
-    return jsonify({'result': 'good'})
+    doc = {
+        'rood_id'   : None,
+        'user_id'   : user_id,
+        'password'  : password,
+        'nickname'  : nickname,
+        'phone'     : phone
+    }
+    db.users.insert_one(doc)
+    return jsonify({'result': 'success', 'msg': '회원가입 되었습니다.'})
 
 
 @app.route("/room/list", methods=["GET"])
