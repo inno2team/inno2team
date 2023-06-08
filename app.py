@@ -27,14 +27,11 @@ def home():
 
 @app.route("/board/get/<room_id>", methods=["GET"])
 def board_get(room_id):
-    board_get = db.room.find_one({"_id": ObjectId(room_id)})
+    board_get = db.room.find_one({"_id": ObjectId(room_id)}, {"max_people": False, "prt": False, "_id": False})
     if (current_user_id in board_get['prt_users']) :
         return jsonify({'result': dumps(board_get)})
     else :
         return jsonify({'msg': '참가한 적이 없는 방입니다!'})
-    # 남들방 왜 들어가짐?
-    # if user_id in board_get['prt_user'] # 유저아이디를 jwt로 받아서 그 아이디 값이 있는걸 확인 받고 값을 돌려주자. else로 msg를 보내면...
-
 
 @app.route("/room/list", methods=["GET"])
 def room_list_get():
@@ -47,7 +44,7 @@ def room_list_get():
 @app.route("/room/join", methods=["UPDATE"])
 def room_join():
     room_id = ObjectId(request.form['room_id'])
-    prt_users = db.room.find_one({"_id": room_id})["prt_users"]
+    prt_users = db.room.find_one({"_id": room_id}, {"prt_users": True, "_id": False})["prt_users"]
     if (current_user_id in prt_users):
         return jsonify({'msg': '이미 참가한 방입니다!'})
     else:
@@ -58,7 +55,7 @@ def room_join():
 
 @app.route("/user/get/<user_id>", methods=["GET"])
 def user_get(user_id):
-    user_get = db.user.find_one({"user_id": user_id}, {"_id": False})
+    user_get = db.user.find_one({"user_id": user_id}, {"_id": False, "phone": True})
     return jsonify({'result': user_get})
 
 
@@ -79,7 +76,7 @@ def create_room_post():
         len(room_info_receive) < 1 or
         int(max_people_receive) < 2 or
         len(location_receive) < 1):
-        return jsonify({'msg': '생성 실패!!'})
+        return jsonify({'msg': '생성 실패!! 입력값을 확인해 주세요.'})
 
     # room_num = list(db.room.find({}, {'_id': False}))
     # room_reader_id=db.room.find({'user_id':''})

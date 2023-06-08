@@ -13,141 +13,14 @@
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
 
+    <link href="{{ url_for('static', filename='css/roomlist.css') }}" rel="stylesheet"/>
+    <script src="{{ url_for('static', filename='js/roomlist.js') }}"></script>
+
     <title>Document</title>
-    <style>
-        .roomlist {
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            justify-content: center;
-        }
 
-        .login_box {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: left;
-            margin: 20px;
-        }
-
-        .input_box {
-            display: flex;
-            flex-direction: column;
-            align-items: start;
-            justify-content: center;
-            margin: 0px 20px 0 0;
-        }
-
-        .room_list {
-            display: flex;
-            flex-direction: row;
-            align-items: stretch;
-            justify-content: center;
-            margin: 20px 20px 20px 20px;
-        }
-
-        .room_list>.table>thead>tr>.th-1 {
-            width: 15%;
-            min-width: 100px;
-            max-width: 500px;
-        }
-
-        .room_list>.table>thead>tr>.th-3 {
-            width: 10%;
-            min-width: 100px;
-            max-width: 500px;
-        }
-
-        .full {
-            width: auto;
-            height: 35px;
-        }
-        
-        #create_btn {
-            float : right;
-            margin: 0 20px 0px 0px;
-        }
-        
-    </style>
-    <script>
-        $(document).ready(function () {
-            listing();
-        });
-
-        function listing() {
-            fetch("/room/list").then((res) => res.json()).then((data) => {
-                let rooms = JSON.parse(data['result'])
-                console.log(rooms)
-                rooms.forEach((a) => {
-                    let room_id = a['_id']['$oid']
-                    let max_people = a['max_people']
-                    let prt = a['prt']
-                    let room_info = a['room_info']
-                    let room_name = a['room_name']
-                    let prt_users = a['prt_users']
-
-                    let temp_html = ``
-
-                    if (prt == max_people) {
-                        // 정원이 가득일때
-                        temp_html = `<tr>
-                                        <td>${room_name}</td>
-                                        <td>
-                                            ${room_info}
-                                        </td>
-                                        <td>
-                                            <img class="full"
-                                    src="https://spconsulting.ca/wp-content/uploads/2022/08/end.png">
-                                            <button onclick="location.href='/board/${room_id}'" class="btn btn-outline-dark" type="button" style="float : right">
-                                                입장
-                                            </button>
-                                        </td>
-                                    </tr>`
-                    } else {
-                        temp_html = `<tr>
-                                        <td>${room_name}</td>
-                                        <td>
-                                            ${room_info}
-                                        </td>
-                                        <td>
-                                            ${prt} / ${max_people}
-                                            <button onclick="join('${room_id}')" class="btn btn-outline-dark" type="button" style="float : right">
-                                                참가
-                                            </button>
-                                        </td>
-                                    </tr>`
-                    }
-                    $('#order-box').append(temp_html)
-                })
-
-            });
-        }
-        function join(room_id) {
-            // let user_id = "nobi1" //임시
-            let formData = new FormData();
-            // formData.append("user_id", user_id); //임시
-            formData.append("room_id", room_id);
-
-            fetch('/room/join', { method: "UPDATE", body: formData }).then((res) => res.json()).then((data) => {
-                alert(data['msg'])
-                window.location.reload()
-            })
-        }
-    </script>
 </head>
 
 <body>
-
-    <h1 style="text-align: center;">모여보드자</h1>
-    <div class="login_box">
-        <div class="input_box">
-            <input type="text" class="id" placeholder="아이디">
-            <input type="text" class="pw" placeholder="비밀번호">
-        </div>
-        <button onclick="search()" type="button" class="btn btn-dark" id="login_btn">
-            로그인하기
-        </button>
-    </div>
     <button onclick="location.href='/create_room'" type="button" class="btn btn-dark" id="create_btn">
         방 생성
     </button>
