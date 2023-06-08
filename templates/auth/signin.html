@@ -38,10 +38,13 @@
         fetch("/login", { method: "POST", body: formData })
           .then((res) => res.json())
           .then((data) => {
-            let date = new Date();
-            date.setTime(date.getTime() + 1 * 60 * 60 * 1000); // 1시간
-            $.cookie("mytoken", data.token, { expires: date });
-            alert("로그인 완료!");
+            console.log(data);
+            if (data.result === "success") {
+              let date = new Date();
+              date.setTime(date.getTime() + 1 * 60 * 60 * 1000); // 1시간
+              $.cookie("mytoken", data.token, { expires: date });
+            }
+            alert(data.msg);
             window.location.href = "/";
           });
       };

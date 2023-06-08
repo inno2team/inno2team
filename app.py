@@ -13,16 +13,15 @@ db = client.dbsparta
 app = Flask(__name__)
 
 
-current_user_id = "nobi1" # 임시
-
 @app.route('/board/<board_id>')
 def room(board_id):
     return render_template('board.html', id = board_id)
 
 @app.route('/')
 def home():
-    user_info = token_decode()
-    if user_info is not None:
+    current_user_id = get_current_user_id(request.cookies.get('mytoken'))
+    if current_user_id is not None:
+        user_info = db.users.find_one({'user_id': current_user_id})
         return render_template('index.html', user_info = user_info)
     return render_template('index.html')
 
@@ -50,7 +49,6 @@ def regist():
 def login():
     user_id = request.form['user_id']
     password = request.form['password']
-    print(user_id, password)
     user_info = db.users.find_one({'user_id':user_id}, {'_id':False})
 
     # password check
@@ -65,8 +63,7 @@ def login():
             # jwt 암호화
             # token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
             token = jwt.encode(payload, "moyoboardza", algorithm="HS256")
-            print(token)
-            return jsonify({'result' : 'success', 'token' : token})
+            return jsonify({'result' : 'success', 'msg': '로그인 완료!', 'token' : token})
         else :
             return jsonify({'result': 'fail', 'msg': '비밀번호가 일치하지 않습니다.'})
     else : 
@@ -74,10 +71,11 @@ def login():
 
 @app.route("/board/get/<room_id>", methods=["GET"])
 def board_get(room_id):
+    current_user_id = get_current_user_id(request.cookies.get('mytoken'))
     board_get = db.rooms.find_one({"_id": ObjectId(room_id)}, {"max_people": False, "prt": False, "_id": False})
-    if (current_user_id() in board_get['prt_users']) :
+    if (current_user_id in board_get['prt_users']) :
         return jsonify({'result': dumps(board_get)})
-    elif (current_user_id() == None):
+    elif (current_user_id == None):
         return jsonify({'msg': '로그인이 필요합니다!'})
     else :
         return jsonify({'msg': '참가한 적이 없는 방입니다!'})
@@ -92,15 +90,16 @@ def room_list_get():
 
 @app.route("/room/join", methods=["UPDATE"])
 def room_join():
+    current_user_id = get_current_user_id(request.cookies.get('mytoken'))
     room_id = ObjectId(request.form['room_id'])
     prt_users = db.rooms.find_one({"_id": room_id}, {"prt_users": True, "_id": False})["prt_users"]
-    if (current_user_id() in prt_users):
+    if (current_user_id in prt_users):
         return jsonify({'msg': '이미 참가한 방입니다!'})
-    elif (current_user_id() == None):
+    elif (current_user_id == None):
         return jsonify({'msg': '로그인이 필요합니다!'})
     else:
         db.rooms.update_one({"_id": room_id}, {
-                           "$inc": {"prt": 1}, "$push": {"prt_users": current_user_id()}})
+                           "$inc": {"prt": 1}, "$push": {"prt_users": current_user_id}})
         return jsonify({'msg': '참가 완료!!'})
 
 
@@ -117,13 +116,14 @@ def create_room():
 
 @app.route("/create_room", methods=["POST"])
 def create_room_post():
+    current_user_id = get_current_user_id(request.cookies.get('mytoken'))
     room_name_receive = request.form['room_name_give']
     room_info_receive = request.form['room_info_give']
     max_people_receive = request.form['max_people_give']
     location_receive = request.form['location_give']
-    prt_users = [current_user_id()]
+    prt_users = [current_user_id]
 
-    if (current_user_id() == None):
+    if (current_user_id == None):
         return jsonify({'msg': '로그인이 필요합니다!'})
     elif (len(room_name_receive) < 1 or
         len(room_info_receive) < 1 or
@@ -131,32 +131,20 @@ def create_room_post():
         len(location_receive) < 1):
         return jsonify({'msg': '생성 실패!! 입력값을 확인해 주세요.'})
     else:
-        # room_num = list(db.rooms.find({}, {'_id': False}))
-        # room_reader_id=db.rooms.find({'user_id':''})
+
         doc = {
             'room_name': room_name_receive,
             'room_info': room_info_receive,
             'max_people': max_people_receive,
             'location': location_receive,
             'prt': 1,
-            'user_id': current_user_id(),
+            'user_id': current_user_id,
             'prt_users': prt_users
         }
         db.rooms.insert_one(doc)
         return jsonify({'msg': '생성 완료!!'})
 
-def token_decode():
-    token_receive = request.cookies.get('mytoken')
-    if token_receive is not None:
-        try:
-            payload = jwt.decode(token_receive, "moyoboardza", algorithms=['HS256'])
-            user_info = db.users.find_one({'user_id' : payload['user_id']})
-            return user_info
-        except jwt.ExpiredSignatureError:
-            return redirect(url_for('/', msg="로그인 시간이 만료되었습니다."))
-    return None
-def current_user_id():
-    token_receive = request.cookies.get('mytoken')
+def get_current_user_id(token_receive):
     if token_receive is not None:
         try:
             payload = jwt.decode(token_receive, "moyoboardza", algorithms=['HS256'])
