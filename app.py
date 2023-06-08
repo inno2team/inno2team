@@ -46,6 +46,17 @@ def regist():
     }
     db.users.insert_one(doc)
     return jsonify({'result': 'success', 'msg': '회원가입 되었습니다.'})
+
+@app.route('/validate', methods = ["POST"])
+def validate():
+    user_id = request.form['user_id']
+    findUser = db.users.find_one({'user_id': user_id}, {'_id': False})
+    print(findUser)
+    if findUser is not None:
+        return jsonify({'result': 'fail', 'msg': '중복된 아이디 입니다. 다시 입력하세요.'})
+    else :
+        return jsonify({'result': 'success', 'msg': '사용 가능한 아이디 입니다.'})
+    
 # 로그인
 @app.route('/login', methods= ["POST"])
 def login():
