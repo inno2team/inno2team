@@ -78,11 +78,6 @@ def login():
             return jsonify({'result': 'fail', 'msg': '비밀번호가 일치하지 않습니다.'})
     else : 
         return jsonify({'result': 'fail', 'msg': '아이디가 일치하지 않습니다.'})
-      
-@app.route("/board/get/<room_id>", methods=["GET"])
-def board_get(room_id):
-    board_get = db.board.find_one({'room_id':room_id},{'_id':False})
-    return jsonify({'result':board_get})
 
 @app.route("/board/get/<room_id>", methods=["GET"])
 def board_get(room_id):
