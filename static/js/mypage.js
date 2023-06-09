@@ -52,7 +52,7 @@ function listing() {
 function delete_room(room_id) {
     let formData = new FormData();
     formData.append('room_id', room_id)
-    fetch('/delete', { method: "POST", body: formData })
+    fetch('/delete', { method: "DELETE", body: formData })
         .then(response => response.json())
         .then(data => {
             alert(data["msg"]);

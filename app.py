@@ -155,7 +155,7 @@ def create_room():
 
 
 
-@app.route("/delete", methods=["POST"])
+@app.route("/delete", methods=["DELETE"])
 def delete_room():
     room_id_recieve = ObjectId(request.form['room_id'])
     token_receive = request.cookies.get('mytoken')

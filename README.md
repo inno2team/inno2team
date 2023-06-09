@@ -37,7 +37,6 @@
 | ------------------- | ----------- | ----------------- | ----------------------------------------------------------------------------------------------------------  | -------------- |
 | 방 전체 리스트 조회 | GET          |/room/list           |                                                                                                           | room list data |
 | 방 생성             | POST        |/create_room         | - room_name<br/>- room_info<br/>- max_people<br/>- location <br/> - prt <br/> - user_id <br/> - prt_users | 200 OK    |
-| 방 삭제             | POST        |/delete              | - room_id<br/>- user_id                                                                             | 200 OK     |
 | 방 인원 추가        | UPDATE       |/room/join           | room_id                                                                                               | 200 OK   |
 | 방 정보             | GET         |/board/get/{room_id} |                                                                                                     | room data      |
 
@@ -58,3 +57,12 @@
 | 댓글 조회 | GET           |/comment/get/{room_id} |                                                                |  comment list data  |
 | 댓글 저장 | POST          |/comment/save/{room_id} | - user_id <br/> - comment <br/> - roomd_id <br/> - nickname   | 200 OK   |
 | 댓글 삭제  | POST          |/comment/delete       | - _id                                                          | 200 OK   |
+
+
+#### Comment
+
+| 기능                      | Method      | URL                     | request                                                           | response                  |
+| ---------                 | ----------- | ---------------------- | --------------------------------------------------------------     | --------                  |
+| 개인정보 수정              | UPDATE       |/mypage/update         |   - password <br> - new_password <br> - nickname <br> - phone       |  200 OK                   |
+| 삭제 가능한 방 리스트 조회  | GET          |/mypage/room/list      |                                                                     | delete_room list data   |
+| 방 삭제                   | DELETE       |/delete                | - room_id<br/>- user_id                                              | 200 OK                 |
