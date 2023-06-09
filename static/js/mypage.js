@@ -3,7 +3,7 @@ $(document).ready(function () {
 });
 
 function listing() {
-    fetch("/room/list").then((res) => res.json()).then((data) => {
+    fetch("/mypage/room/list").then((res) => res.json()).then((data) => {
         let rooms = JSON.parse(data['result'])
         console.log(rooms)
         rooms.forEach((a) => {
@@ -25,8 +25,8 @@ function listing() {
                                 <td>
                                     <img class="full"
                             src="https://spconsulting.ca/wp-content/uploads/2022/08/end.png">
-                                    <button onclick="location.href='/board/${room_id}'" class="btn btn-outline-dark" type="button" style="float : right">
-                                        입장
+                                    <button onclick="delete_room('${room_id}')" class="btn btn-outline-danger" type="button" style="float : right">
+                                        삭제
                                     </button>
                                 </td>
                             </tr>`
@@ -38,8 +38,8 @@ function listing() {
                                 </td>
                                 <td>
                                     ${prt} / ${max_people}
-                                    <button onclick="join('${room_id}')" class="btn btn-outline-dark" type="button" style="float : right">
-                                        참가
+                                    <button onclick="delete_room('${room_id}')" class="btn btn-outline-danger" type="button" style="float : right">
+                                        삭제
                                     </button>
                                 </td>
                             </tr>`
@@ -49,12 +49,41 @@ function listing() {
 
     });
 }
-function join(room_id) {
-    let formData = new FormData();
-    formData.append("room_id", room_id);
 
-    fetch('/room/join', { method: "UPDATE", body: formData }).then((res) => res.json()).then((data) => {
-        alert(data['msg'])
-        window.location.reload()
-    })
+function delete_room(room_id) {
+    let formData = new FormData();
+    formData.append('room_id', room_id)
+    fetch('/delete', { method: "POST", body: formData })
+        .then(response => response.json())
+        .then(data => {
+            alert(data["msg"]);
+            window.location.reload();
+        })
 }
+
+function change_info() {
+    let password = $('#password').val();
+    let new_password = $('#new_password').val();
+    let nickname = $('#nickname').val();
+    let phone = $('#phone').val();
+
+    let formData = new FormData();
+    formData.append("password_give", password);
+    formData.append("new_password_give", new_password);
+    formData.append("nickname_give", nickname);
+    formData.append("phone_give", phone);
+
+    fetch('/mypage/update', { method: "UPDATE", body: formData })
+        .then((response) => response.json())
+        .then((data) => {
+            let msg = data['msg']
+            if (msg === '수정 완료') {
+                window.location.href = "/"
+            }
+            else {
+                window.location.reload();
+            }
+            alert(data["msg"])
+        })
+}
+
