@@ -22,13 +22,11 @@
 
 ---
 ### 2. 와이어 프레임
-![Section 1](https://github.com/inno2team/inno2team/assets/131260371/9a2a4cd2-7c20-43fa-ac3f-770ec53235fc)
+![Section 1](https://github.com/inno2team/inno2team/assets/131260371/333a8ee7-89bd-4bf0-adbf-7dd174c2b9c0)
+![Section 2](https://github.com/inno2team/inno2team/assets/131260371/145d8982-99de-4800-b89c-653e636c5eeb)
 
-![Section 2](https://github.com/inno2team/inno2team/assets/131260371/ae1fe1e7-b9f8-4296-82c1-7a34ffade41d)
-
-![Section 3](https://github.com/inno2team/inno2team/assets/131260371/22a27e20-71a2-4bc2-80c0-4b118e987d45)
-
-![Section 4](https://github.com/inno2team/inno2team/assets/131260371/b64d9641-ea30-4649-94c1-5dc6bc1fec03)
+![Section 3](https://github.com/inno2team/inno2team/assets/131260371/f8dff0bc-393b-42b3-bc45-5b01e61bdc7b)
+![Section 4](https://github.com/inno2team/inno2team/assets/131260371/6816d520-8166-4ec7-bf13-d5e2b97d92ab)
 
 ---
 ### 3. API
