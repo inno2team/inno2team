@@ -16,7 +16,9 @@
   [최도영](https://github.com/mabyoungg)
 
 #### 1.3 Thumbnail
-![image](https://github.com/inno2team/inno2team/assets/131260371/ecae1a0a-449b-4abc-9202-09de451ebf11)
+![244397107-c4da4184-dce2-47db-80d7-aa4678c6b101](https://github.com/inno2team/inno2team/assets/131260371/a0bd98c9-b43f-4664-a657-3d3bb0f4d59d)
+
+![모여보드자](https://github.com/inno2team/inno2team/assets/131260371/c97388b2-45a4-49b6-a78d-76ece27f8e94)
 
 ---
 ### 2. 와이어 프레임
