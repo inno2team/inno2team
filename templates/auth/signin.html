@@ -54,6 +54,9 @@
           window.location.href = "/";
         }
       };
+      const onClickMypage = () => {
+        window.location.href = "/mypage"
+      }
     </script>
   </head>
   <body>
@@ -66,6 +69,13 @@
         <div><b>{{ user_info.nickname }}</b> 님 어서오세요.</div>
         <!-- logout -->
         <div class="buttons mt-5">
+          <button 
+            type="button" 
+            class="btn btn-outline-success"
+            onclick="onClickMypage()"
+          >
+            마이페이지
+          </button>
           <button
             type="button"
             class="btn btn-outline-danger"

@@ -81,7 +81,34 @@ def login():
             return jsonify({'result': 'fail', 'msg': '비밀번호가 일치하지 않습니다.'})
     else : 
         return jsonify({'result': 'fail', 'msg': '아이디가 일치하지 않습니다.'})
+# my page 
+@app.route('/mypage')
+def move_mypage():
+   return render_template('mypage.html')
 
+@app.route("/mypage/update", methods=["UPDATE"])
+def update_user_info():
+    current_user_id = get_current_user_id(request.cookies.get('mytoken'))
+    password_recieve = request.form['password_give']
+    new_password_recieve = bcrypt.hashpw(request.form['new_password_give'].encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+    nickname_recieve = request.form['nickname_give']
+    phone_recieve = request.form['phone_give']
+
+    user_info= db.users.find_one({"user_id": current_user_id})
+    if bcrypt.checkpw(password_recieve.encode("utf-8"), user_info['password'].encode("utf-8")) is True:
+        db.users.update_one({"user_id": current_user_id}, {"$set" : {"password": new_password_recieve, "nickname": nickname_recieve, "phone": phone_recieve}})
+        return jsonify({'msg': '수정 완료'})
+    else:
+        return jsonify({'msg': '비밀번호가 틀립니다!'})
+    
+@app.route("/mypage/room/list", methods=["GET"])
+def mypage_room_list_get():
+    current_user_id = get_current_user_id(request.cookies.get('mytoken'))
+    mypage_room_list = list(db.rooms.find(
+        {"user_id": current_user_id}, {"user_id": False, "location": False}))
+    return jsonify({'result': dumps(mypage_room_list)})
+
+# 방 내부
 @app.route("/board/get/<room_id>", methods=["GET"])
 def board_get(room_id):
     current_user_id = get_current_user_id(request.cookies.get('mytoken'))
@@ -94,12 +121,11 @@ def board_get(room_id):
         return jsonify({'msg': '로그인이 필요합니다!'})
     else :
         return jsonify({'msg': '이미 마감된 방입니다!'})
-
+# 방 리스트
 @app.route("/room/list", methods=["GET"])
 def room_list_get():
     all_board = list(db.rooms.find(
         {}, {"user_id": False, "location": False}))
-    
 # 결과적으로 room_name, room_info, max_people, prt, _id만 나오게 된다.
     return jsonify({'result': dumps(all_board)})
 
@@ -227,6 +253,8 @@ def comment_delete():
         return jsonify({'msg': '삭제완료'})
     else:
         return jsonify({'msg': '작성자가 아닙니다.'})
+    
+
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
