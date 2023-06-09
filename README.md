@@ -21,8 +21,11 @@
 ---
 ### 2. 와이어 프레임
 ![Section 1](https://github.com/inno2team/inno2team/assets/131260371/9a2a4cd2-7c20-43fa-ac3f-770ec53235fc)
+
 ![Section 2](https://github.com/inno2team/inno2team/assets/131260371/ae1fe1e7-b9f8-4296-82c1-7a34ffade41d)
+
 ![Section 3](https://github.com/inno2team/inno2team/assets/131260371/22a27e20-71a2-4bc2-80c0-4b118e987d45)
+
 ![Section 4](https://github.com/inno2team/inno2team/assets/131260371/b64d9641-ea30-4649-94c1-5dc6bc1fec03)
 
 ---
