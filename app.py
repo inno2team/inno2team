@@ -51,7 +51,6 @@ def regist():
 def validate():
     user_id = request.form['user_id']
     findUser = db.users.find_one({'user_id': user_id}, {'_id': False})
-    print(findUser)
     if findUser is not None:
         return jsonify({'result': 'fail', 'msg': '중복된 아이디 입니다. 다시 입력하세요.'})
     else :

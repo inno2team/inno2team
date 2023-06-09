@@ -5,7 +5,6 @@ $(document).ready(function () {
 function listing() {
     fetch("/mypage/room/list").then((res) => res.json()).then((data) => {
         let rooms = JSON.parse(data['result'])
-        console.log(rooms)
         rooms.forEach((a) => {
             let room_id = a['_id']['$oid']
             let max_people = a['max_people']

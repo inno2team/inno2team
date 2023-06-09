@@ -38,7 +38,6 @@
         fetch("/login", { method: "POST", body: formData })
           .then((res) => res.json())
           .then((data) => {
-            console.log(data);
             if (data.result === "success") {
               let date = new Date();
               date.setTime(date.getTime() + 1 * 60 * 60 * 1000); // 1시간
