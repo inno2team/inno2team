@@ -66,3 +66,4 @@
 | 개인정보 수정              | UPDATE       |/mypage/update         |   - password <br> - new_password <br> - nickname <br> - phone       |  200 OK                   |
 | 삭제 가능한 방 리스트 조회  | GET          |/mypage/room/list      |                                                                     | delete_room list data   |
 | 방 삭제                   | DELETE       |/delete                | - room_id<br/>- user_id                                              | 200 OK                 |
+# week
